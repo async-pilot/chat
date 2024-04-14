@@ -1,6 +1,6 @@
 "use client";
 
-import { BringToFront, Sun } from "lucide-react";
+import { Sun } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
