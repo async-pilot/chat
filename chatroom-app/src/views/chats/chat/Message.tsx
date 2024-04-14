@@ -3,13 +3,12 @@ import dayjs from "dayjs";
 import { forwardRef } from "react";
 import Image from "next/image";
 
-import { getImageUrl } from "@/app/config/get-image-url.config";
 import { IMessage } from "@/core/types/chat.types";
 import { IUser } from "@/core/types/user.types";
 import { cn } from "@/core/utils/cn";
 import { getFileUrl } from "@/core/utils/pbUtils";
 
-const Message = forwardRef(({ message, user }: { message: IMessage; user: IUser }) => {
+const Message = ({ message, user }: { message: IMessage; user: IUser }) => {
   const isSender = user?.email === message.sender.email;
 
   return (
@@ -38,8 +37,6 @@ const Message = forwardRef(({ message, user }: { message: IMessage; user: IUser 
       </div>
     </div>
   );
-});
-
-Message.displayName = "Message";
+};
 
 export { Message };

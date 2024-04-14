@@ -9,8 +9,8 @@ import { useSearchParams } from "next/navigation";
 import formConfig from "@/core/features/forms/register/form-config";
 import { RegisterFormFields } from "@/core/features/forms/register/types";
 import { apiPost } from "@/core/services/apiService";
-import { Button } from "@/components/button/Button";
-import Field from "@/components/field/Field";
+import { Button } from "@/components/Button/Button";
+import Field from "@/components/Field/Field";
 
 export default function RegisterForm() {
   const queryParams = useSearchParams();

@@ -25,14 +25,13 @@ export const GET = async (req: NextRequest, { params }: Params) => {
 
       const res = await pb.collection("chats").getList(Number(page), DEFAULT_PAGE_SIZE, {
         filter: `participants ~ "${sender}" && participants ~ "${recipient}"`,
-        expand: "messages.sender,participants",
+        expand: "participants",
       });
 
       const chats = res.items.map((data) => mapChatFromPayload(data as unknown as IChatPayload));
       return NextResponse.json({ ...res, items: chats }, { status: 200 });
     }
 
-    // const data = await pb.collection("chats").getOne(id, { expand: "messages.sender,participants" });
     const chat = mapChatFromPayload(data as unknown as IChatPayload);
 
     return NextResponse.json(chat, { status: 200 });
@@ -40,34 +39,6 @@ export const GET = async (req: NextRequest, { params }: Params) => {
     return NextResponse.json({ error }, { status: 500 });
   }
 };
-
-// export const GET = async (req: NextRequest) => {
-//   const page = req.nextUrl.searchParams.get("page");
-//   const sort = req.nextUrl.searchParams.get("sort");
-//   const filter = req.nextUrl.searchParams.get("filter");
-
-//   const pb = await getPbClient();
-
-//   try {
-//     if (page || sort) {
-//       const res = await pb.collection("bot_users").getList(Number(page), DEFAULT_PAGE_SIZE, {
-//         ...(sort && { sort }),
-//         ...(filter && { filter }),
-//       });
-
-//       return NextResponse.json(res, { status: 200 });
-//     }
-
-//     const res = await pb.collection("bot_users").getFullList({ ...(filter && { filter }), sort: "-created" });
-
-//     return NextResponse.json(res, { status: 200 });
-//   } catch (e: any) {
-//     return NextResponse.json(
-//       { error: `failed to get bot_users: code ${e.response.code}, error: ${e.response.message}` },
-//       { status: 500 }
-//     );
-//   }
-// };
 
 export const PATCH = async (req: NextRequest, { params }: Params) => {
   const { id } = params;
@@ -77,17 +48,14 @@ export const PATCH = async (req: NextRequest, { params }: Params) => {
   try {
     const message = await pb.collection("messages").create(body);
 
-    // Получение текущего чата и его сообщений
     const currentChats = await pb
       .collection("chats")
       .getFullList({ filter: `id = "${id}"`, expand: "messages.sender" });
-    const currentChat = currentChats[0]; // Предполагаем, что нужный чат всегда первый в списке
+    const currentChat = currentChats[0];
     const updatedMessagesIds =
       currentChat && currentChat.messages ? [...currentChat.messages, message.id] : [message.id];
 
     const data = await pb.collection("chats").update(id, { messages: updatedMessagesIds });
-
-    // const data = await pb.collection("chats").update(id, { messages: message.id });
 
     return NextResponse.json(data, { status: 201 });
   } catch (error) {

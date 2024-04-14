@@ -20,10 +20,7 @@ export function ChatHeader({ correspondent }: { correspondent?: IUser }) {
           className="mr-4"
           priority
         />
-        <div className="text-sm">
-          <div>{correspondent?.username}</div>
-          <div className="opacity-30">2 members</div>
-        </div>
+        <div className="text-sm">{correspondent?.username}</div>
       </div>
       <button className="text-[#7C7275] transition-colors ease-linear hover:text-white">
         <Search />

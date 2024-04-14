@@ -1,22 +1,12 @@
-import { IChat, IChatPayload, IMessage, IMessagePayload } from "@/core/types/chat.types";
-
-import { mapMessageFromPayload } from "./messages";
+import { IChat, IChatPayload } from "@/core/types/chat.types";
 
 export const mapChatFromPayload = (payload: IChatPayload): IChat => {
-  const chat: IChat = {
+  return {
     id: payload?.id ?? "",
-    messages: [],
+    type: payload.type ?? "",
     participants: payload?.expand?.participants ?? [],
     created: payload?.created ?? "",
     collectionName: payload?.collectionName ?? "",
     collectionId: payload?.collectionId ?? "",
   };
-
-  if (payload.expand && payload.expand.messages) {
-    chat.messages = payload.expand.messages.map((messagePayload: IMessage) => {
-      return mapMessageFromPayload(messagePayload as unknown as IMessagePayload);
-    });
-  }
-
-  return chat;
 };

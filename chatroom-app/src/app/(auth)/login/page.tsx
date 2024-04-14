@@ -7,7 +7,7 @@ import { session } from "@/core/services/sessionService";
 import LoginForm from "./LoginForm";
 
 export const metadata: Metadata = {
-  title: "Register",
+  title: "Login",
   ...NO_INDEX_PAGE,
 };
 export default async function Login() {

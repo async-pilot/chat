@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 
 import { cn } from "@/core/utils/cn";
 
-import { MENU } from "./sidebar.data";
+import { MENU } from "./sidebarData";
 
 export function Sidebar() {
   const pathname = usePathname();

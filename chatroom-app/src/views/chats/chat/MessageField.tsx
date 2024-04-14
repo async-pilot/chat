@@ -1,27 +1,16 @@
 "use client";
 
-import { $fetch } from "@/$api/api.fetch";
-// import { useAuth } from "@/hooks/useAuth";
 import { useChatSubscription } from "@/hooks/useChatSubscription";
 import { useFormik } from "formik";
-// import { useMutation } from "@tanstack/react-query";
 import { ArrowRightToLine, Send } from "lucide-react";
-import { KeyedMutator } from "swr";
 import * as Yup from "yup";
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 
-import { apiPatch, apiPost } from "@/core/services/apiService";
-import { IChat, IMessage } from "@/core/types/chat.types";
+import { apiPatch } from "@/core/services/apiService";
 import { IUser } from "@/core/types/user.types";
-import Field from "@/components/field/Field";
+import Field from "@/components/Field/Field";
 
-export function MessageField({ chatId, user, mutate }: { user: IUser; mutate: KeyedMutator<IChat>; chatId: string }) {
-  // const [message, setMessage] = useState("");
-
+export function MessageField({ chatId, user, mutate }: { user: IUser; mutate: any; chatId: string }) {
   useChatSubscription(chatId, user);
-  // const { user } = useAuth();
-
   const formik = useFormik({
     initialValues: {
       text: "",
@@ -43,7 +32,10 @@ export function MessageField({ chatId, user, mutate }: { user: IUser; mutate: Ke
   });
 
   return (
-    <form onSubmit={formik.handleSubmit} className="flex items-center justify-between border-t border-border p-layout">
+    <form
+      onSubmit={formik.handleSubmit}
+      className="flex w-full items-center justify-between border-t border-border p-layout"
+    >
       <Field
         placeholder="Write a message..."
         Icon={ArrowRightToLine}

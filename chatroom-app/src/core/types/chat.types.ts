@@ -7,24 +7,25 @@ export type IMessage = Pick<RecordModel, "collectionId" | "collectionName"> & {
   text: string;
   created: string;
   sender: IUser;
+  chat: IChat;
 };
 
-export type IMessagePayload = Omit<IMessage, "sender"> & {
+export type IMessagePayload = Omit<IMessage, "sender" | "chat"> & {
   expand: {
     sender: IUser;
+    chat: IChat;
   };
 };
 
 export type IChat = Pick<RecordModel, "collectionId" | "collectionName"> & {
   id: number;
-  messages: IMessage[];
+  type: string;
   participants: IUser[];
   created: string;
 };
 
-export type IChatPayload = Omit<IChat, "messages" | "participants"> & {
+export type IChatPayload = Omit<IChat, "participants"> & {
   expand: {
-    messages: IMessage[];
     participants: IUser[];
   };
 };

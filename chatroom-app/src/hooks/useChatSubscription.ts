@@ -1,17 +1,11 @@
 import PocketBase from "pocketbase";
-import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { pocketbaseUrl } from "@/core/config/apiRoutes";
-import { mapChatFromPayload } from "@/core/mappers/chats";
-import { IChatPayload } from "@/core/types/chat.types";
+import { mapMessageFromPayload } from "@/core/mappers/messages";
+import { IMessagePayload } from "@/core/types/chat.types";
 import { IUser } from "@/core/types/user.types";
 import { showToast } from "@/components/notification/Notification";
-
-type Props = {
-  user: IUser;
-  chatId: string;
-};
 
 export const useChatSubscription = (chatId: string, user: IUser) => {
   useEffect(() => {
@@ -23,33 +17,17 @@ export const useChatSubscription = (chatId: string, user: IUser) => {
 
     window.addEventListener("click", handleFirstUserInteraction);
     window.addEventListener("keydown", handleFirstUserInteraction);
-    pb.collection("chats").subscribe(
+
+    pb.collection("messages").subscribe(
       "*",
       (e) => {
-        const chat = mapChatFromPayload(e.record as unknown as IChatPayload);
-
-        if (e.action === "update") {
-          const lastMessage = chat.messages[chat.messages.length - 1];
-
-          if (lastMessage.sender.id === user.id) {
-            return;
-          }
-
-          const lastSenderUsername = lastMessage.sender.username;
-          let showToastFlag = false;
-
-          chat.participants.forEach((participant) => {
-            if (user.username !== lastSenderUsername) {
-              showToastFlag = true;
-            }
-          });
-
-          if (showToastFlag) {
-            showToast({ message: `New message from ${lastMessage.sender.username}`, status: "info" });
-          }
+        const message = mapMessageFromPayload(e.record as unknown as IMessagePayload);
+        console.log(message.sender?.id !== user.id);
+        if (e.action === "create" && message.sender?.id !== user.id) {
+          showToast({ message: `New message from ${message.sender.username}`, status: "info" });
         }
       },
-      { expand: "messages.sender,participants" }
+      { expand: "sender, chat.participants" }
     );
 
     return () => {

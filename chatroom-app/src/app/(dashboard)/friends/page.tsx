@@ -10,6 +10,6 @@ export const metadata: Metadata = {
 
 export default async function FriendsPage() {
   const sess = await session();
-
+  console.log(sess?.user);
   return <Friends user={sess?.user as unknown as IUser} />;
 }

@@ -22,35 +22,7 @@ const chooseIcon = (status: Status) => statusToIcon[status] || statusToIcon.info
 
 const chooseNotificationSound = (status: Status) => new Audio(statusToSoundFile[status] || statusToSoundFile.info);
 
-// const chooseIcon = (status: "success" | "warning" | "error" | "info"): Renderable => {
-//   switch (status) {
-//     case "success":
-//       return "✅";
-//     case "warning":
-//       return "⚠️";
-//     case "error":
-//       return "❌";
-
-//     default:
-//       return "🔔";
-//   }
-// };
-
 export const showToast = async ({ message, status }: Toast) => {
-  //   const chooseNotificationSound = (status: "success" | "warning" | "error" | "info") => {
-  //     switch (status) {
-  //       case "success":
-  //         return new Audio("/success.mp3");
-  //       case "warning":
-  //         return new Audio("/warning.mp3");
-  //       case "error":
-  //         return new Audio("/error.mp3");
-
-  //       default:
-  //         return new Audio("/info.mp3");
-  //     }
-  //   };
-
   toast(message, {
     style: {
       borderRadius: "10px",

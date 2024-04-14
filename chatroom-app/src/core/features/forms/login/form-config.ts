@@ -1,7 +1,8 @@
 import { FormikConfig, FormikHelpers } from "formik";
+
+import { initialValues } from "./initial-values";
 import { LoginFormFields } from "./types";
 import { validationSchema } from "./validations";
-import { initialValues } from "./initial-values";
 
 export type FormConfigProps = {
   onSubmit: (values: LoginFormFields, formikHelpers: FormikHelpers<LoginFormFields>) => void | Promise<any>;

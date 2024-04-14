@@ -12,7 +12,7 @@ import FriendCard from "./FriendCard";
 export function Friends({ user }: { user: IUser }) {
   const { data: users } = useSWR<IUser[]>("/users", apiGet);
   const { data: currentUser } = useSWR<IUser>(`/users/${user.id}`, apiGet);
-
+  console.log(user.id);
   if (!users || !currentUser) {
     return <Loader />;
   }

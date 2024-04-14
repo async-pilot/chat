@@ -3,7 +3,7 @@
 import { User } from "next-auth";
 import Link from "next/link";
 
-import { Button } from "@/components/button/Button";
+import { Button } from "@/components/Button/Button";
 
 import { BackgroundBeams } from "./BackgroundBeams";
 
@@ -27,7 +27,9 @@ export function Hero({ user }: Props) {
             <Button className="relative z-10 ">Go to chat</Button>
           </Link>
         ) : (
-          <Button className="relative z-10 ">Sign up to try the app&apos;s features</Button>
+          <Link href="/register">
+            <Button className="relative z-10 ">Sign up to try the app&apos;s features</Button>
+          </Link>
         )}
       </div>
       <BackgroundBeams />

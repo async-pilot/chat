@@ -5,14 +5,12 @@ import { signOut } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-import { getImageUrl } from "@/app/config/get-image-url.config";
 import { IUser } from "@/core/types/user.types";
-import { getFileUrl } from "@/core/utils/pbUtils";
 import { Loader } from "@/components/loader/Loader";
 
 export function CurrentUser({ user }: { user: IUser }) {
   const { push } = useRouter();
-  // const { data, isLoading } = useProfile();
+
   return (
     <div className="flex items-center justify-between p-layout">
       <div className="flex items-center">
@@ -20,7 +18,7 @@ export function CurrentUser({ user }: { user: IUser }) {
           <Loader />
         ) : (
           <Image
-            src={user.avatar ?? "/no-avatar.png"}
+            src={!user.avatar && user.avatar === "" ? "/no-avatar.png" : String(user.avatar)}
             alt={user?.email || ""}
             width={50}
             height={50}

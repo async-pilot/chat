@@ -15,7 +15,7 @@ export const GET = async (req: NextRequest, { params }: Params) => {
 
   try {
     const data = await pb.collection("users").getOne(id, { expand: "friends" });
-
+    console.log(id);
     const user = mapUserFromPayload(data as unknown as IUserPayload);
     return NextResponse.json(user, { status: 200 });
   } catch (error) {

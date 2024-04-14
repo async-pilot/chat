@@ -9,9 +9,7 @@ export const GET = async (req: NextRequest) => {
   const filter = req.nextUrl.searchParams.get("filter");
 
   try {
-    const data = await pb
-      .collection("chats")
-      .getFullList({ ...(filter && { filter }), expand: "messages.sender,participants" });
+    const data = await pb.collection("chats").getFullList({ ...(filter && { filter }), expand: "participants" });
 
     const chats = data.map((item) => mapChatFromPayload(item as unknown as IChatPayload));
     return NextResponse.json(chats, { status: 200 });

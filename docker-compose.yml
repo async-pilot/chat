@@ -1,0 +1,49 @@
+version: "3"
+
+services:
+  chatroom-app:
+    image: chatroom-app:latest
+    container_name: chatroom-app
+    restart: unless-stopped
+    build:
+      context: ./chatroom-app
+      dockerfile: Dockerfile
+    environment:
+      NEXTAUTH_URL: ${CHATROOM_APP_NEXTAUTH_URL}
+      NEXT_PUBLIC_BASE_URL: ${CHATROOM_APP_NEXTAUTH_URL_INTERNAL}
+      NEXTAUTH_SECRET: ${CHATROOM_APP_NEXTAUTH_SECRET}
+      NEXT_PUBLIC_POCKETBASE_URL: ${NEXT_PUBLIC_POCKETBASE_URL}
+    ports:
+      - "127.0.0.1:8080:3000"
+    networks:
+      - cht
+    depends_on:
+      chatroom-service:
+        condition: service_healthy
+
+  chatroom-service:
+    image: chatroom-service:latest
+    container_name: chatroom-service
+    restart: unless-stopped
+    build:
+      context: ./chatroom-service
+      dockerfile: Dockerfile
+      args:
+        - POCKETBASE_VERSION=0.22.8
+    env_file: .env
+    ports:
+      - "127.0.0.1:8090:8090"
+    volumes:
+      - ./.chtdata/pb_data:/app/pb_data
+    networks:
+      - cht
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/api/health"]
+      interval: 10s
+      timeout: 5s
+      start_period: 5s
+
+networks:
+  cht:
+    name: CHT
+    driver: bridge

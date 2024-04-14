@@ -8,19 +8,18 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import formConfig from "@/core/features/forms/login/form-config";
 import { LoginFormFields } from "@/core/features/forms/login/types";
-import { Button } from "@/components/button/Button";
-import Field from "@/components/field/Field";
+import { Button } from "@/components/Button/Button";
+import Field from "@/components/Field/Field";
 
 export default function LoginForm() {
   const queryParams = useSearchParams();
 
   const onSubmit = async (values: LoginFormFields) => {
     await signIn("credentials", {
-      redirect: true,
+      redirect: false,
       callbackUrl: queryParams.get("callbackUrl") ?? undefined,
       ...values,
     });
-    //
   };
 
   const formik = useFormik<LoginFormFields>(
@@ -42,8 +41,8 @@ export default function LoginForm() {
             value={formik.values.identity}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            placeholder="Enter email"
-            type="email"
+            placeholder="Enter email/username"
+            type="text"
             Icon={AtSign}
           />
           {formik.touched.identity && formik.errors.identity ? (
@@ -57,7 +56,7 @@ export default function LoginForm() {
             value={formik.values.password}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            placeholder="Enter email"
+            placeholder="Enter password"
             Icon={KeyRound}
           />
           {formik.touched.password && formik.errors.password ? (

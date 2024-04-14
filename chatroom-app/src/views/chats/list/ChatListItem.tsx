@@ -1,11 +1,11 @@
 "use client";
 
-// import { useAuth } from "@/hooks/useAuth";
 import dayjs from "dayjs";
+import useSWR from "swr";
 import Image from "next/image";
 import Link from "next/link";
 
-import { getImageUrl } from "@/app/config/get-image-url.config";
+import { apiGetExtended } from "@/core/services/apiService";
 import { IChat } from "@/core/types/chat.types";
 import { IUser } from "@/core/types/user.types";
 import { getFileUrl } from "@/core/utils/pbUtils";
@@ -23,11 +23,15 @@ interface IChatListItem {
 */
 
 export function ChatListItem({ chat, user }: IChatListItem) {
-  // const { user } = useAuth();
-
   const correspondent = chat.participants.find((u) => u.email !== user?.email);
-  const lastMessage = chat.messages.at(-1);
 
+  const { data: messages } = useSWR([`/messages`, { filter: `chat.participants ~ "${user.id}"` }], apiGetExtended);
+
+  if (!messages) {
+    return;
+  }
+
+  const lastMessage = messages[0] ?? "-";
   return (
     <Link
       href={`/chat/${chat.id}`}
