@@ -1,37 +1,43 @@
+# This config was automatically generated from your source code
+# Stacks detected: deps:node:chatroom-app
 version: 2.1
-
+orbs:
+  node: circleci/node@5
 jobs:
-  build:
-    docker:
-      - image: cimg/node:20
+  build-node:
+    # Build node project
+    executor: node/default
+    working_directory: ~/project/chatroom-app
     steps:
-      - checkout
-      - setup_remote_docker:
-          version: 20.10.7
+      - checkout:
+          path: ~/project
+      - node/install-packages:
+          pkg-manager: npm
       - run:
-          name: Install Docker Compose
-          command: |
-            mkdir -p $HOME/.docker/cli-plugins
-            curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o $HOME/.docker/cli-plugins/docker-compose
-            chmod +x $HOME/.docker/cli-plugins/docker-compose
-            echo 'export PATH=$HOME/.docker/cli-plugins:$PATH' >> $BASH_ENV
-            source $BASH_ENV
+          command: npm run build
       - run:
-          name: Build Docker images
-          command: |
-            docker-compose -f docker-compose.yml build
+          name: Create the ~/artifacts directory if it doesn't exist
+          command: mkdir -p ~/artifacts
+      # Copy output to artifacts dir
       - run:
-          name: Push Docker images to Docker Hub
-          command: |
-            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
-            docker-compose -f docker-compose.yml push
+          name: Copy artifacts
+          command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
+      - store_artifacts:
+          path: ~/artifacts
+          destination: node-build
+  deploy:
+    # This is an example deploy job, not actually used by the workflow
+    docker:
+      - image: cimg/base:stable
+    steps:
+      # Replace this with steps to deploy to users
       - run:
-          name: Run Docker Compose
-          command: |
-            docker-compose -f docker-compose.yml up -d
-
+          name: deploy
+          command: '#e.g. ./deploy.sh'
 workflows:
-  version: 2
-  build_and_deploy:
+  build:
     jobs:
-      - build
+      - build-node
+    # - deploy:
+    #     requires:
+    #       - build-node
