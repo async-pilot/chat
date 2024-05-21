@@ -1,6 +1,8 @@
 version: 2.1
 orbs:
   node: circleci/node@5
+  docker: circleci/docker@1.0.0
+
 jobs:
   build-node:
     executor: node/default
@@ -40,7 +42,24 @@ jobs:
           path: ~/artifacts
           destination: node-build
 
+  build-docker:
+    docker:
+      - image: circleci/python:3.8
+    steps:
+      - setup_remote_docker:
+          version: 20.10.7
+      - checkout
+      - run:
+          name: Построение Docker образа
+          command: docker build -t chatroom-app .
+      - run:
+          name: Запуск контейнера
+          command: docker run -d -p 3000:3000 chatroom-app
+
 workflows:
   build:
     jobs:
       - build-node
+      - build-docker:
+          requires:
+            - build-node
