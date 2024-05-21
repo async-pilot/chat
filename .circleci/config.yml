@@ -11,16 +11,25 @@ jobs:
     steps:
       - checkout:
           path: ~/project
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package-lock.json" }}
+            - v1-dependencies-
       - node/install-packages:
           pkg-manager: npm
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package-lock.json" }}
       - run:
+          name: Сборка проекта
           command: npm run build
       - run:
-          name: Create the ~/artifacts directory if it doesn't exist
+          name: Создание директории артефактов
           command: mkdir -p ~/artifacts
       # Copy output to artifacts dir
       - run:
-          name: Copy artifacts
+          name: Копирование артефактов
           command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
       - store_artifacts:
           path: ~/artifacts
