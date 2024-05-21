@@ -11,8 +11,11 @@ jobs:
       - run:
           name: Install Docker Compose
           command: |
-            curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            chmod +x /usr/local/bin/docker-compose
+            mkdir -p $HOME/.docker/cli-plugins
+            curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o $HOME/.docker/cli-plugins/docker-compose
+            chmod +x $HOME/.docker/cli-plugins/docker-compose
+            echo 'export PATH=$HOME/.docker/cli-plugins:$PATH' >> $BASH_ENV
+            source $BASH_ENV
       - run:
           name: Build Docker images
           command: |
