@@ -1,49 +1,44 @@
-version: "3"
+version: 2.1
 
-services:
-  chatroom-app:
-    image: chatroom-app:latest
-    container_name: chatroom-app
-    restart: unless-stopped
-    build:
-      context: ./chatroom-app
-      dockerfile: Dockerfile
-    environment:
-      NEXTAUTH_URL: ${CHATROOM_APP_NEXTAUTH_URL}
-      NEXT_PUBLIC_BASE_URL: ${CHATROOM_APP_NEXTAUTH_URL_INTERNAL}
-      NEXTAUTH_SECRET: ${CHATROOM_APP_NEXTAUTH_SECRET}
-      NEXT_PUBLIC_POCKETBASE_URL: ${NEXT_PUBLIC_POCKETBASE_URL}
-    ports:
-      - "127.0.0.1:8080:3000"
-    networks:
-      - cht
-    depends_on:
-      chatroom-service:
-        condition: service_healthy
+executors:
+  docker-executor:
+    docker:
+      - image: circleci/node:latest
+    working_directory: ~/repo
 
-  chatroom-service:
-    image: chatroom-service:latest
-    container_name: chatroom-service
-    restart: unless-stopped
-    build:
-      context: ./chatroom-service
-      dockerfile: Dockerfile
-      args:
-        - POCKETBASE_VERSION=0.22.8
-    env_file: .env
-    ports:
-      - "127.0.0.1:8090:8090"
-    volumes:
-      - ./.chtdata/pb_data:/app/pb_data
-    networks:
-      - cht
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8090/api/health"]
-      interval: 10s
-      timeout: 5s
-      start_period: 5s
+jobs:
+  build-and-test:
+    executor: docker-executor
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.7
+          docker_layer_caching: true
 
-networks:
-  cht:
-    name: CHT
-    driver: bridge
+      # Install Docker Compose
+      - run:
+          name: Install Docker Compose
+          command: |
+            curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            chmod +x /usr/local/bin/docker-compose
+
+      # Build and run the services
+      - run:
+          name: Build and Run Docker Compose
+          command: docker-compose up --build -d
+
+      # Run your tests here
+      - run:
+          name: Run Tests
+          command: docker-compose exec chatroom-app npm test
+
+      # Tear down the services
+      - run:
+          name: Tear Down Docker Compose
+          command: docker-compose down
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build-and-test
