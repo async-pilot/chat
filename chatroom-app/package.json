@@ -1,45 +1,49 @@
-version: 2.1
-orbs:
-  node: circleci/node@5
-jobs:
-  build-node:
-    executor: node/default
-    working_directory: ~/project/chatroom-app
-    steps:
-      - checkout:
-          path: ~/project
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package-lock.json" }}
-            - v1-dependencies-
-      - run:
-          name: Установка Node.js и зависимостей
-          command: |
-            echo "Installing Node.js version and dependencies..."
-            node --version
-            npm --version
-            npm install
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package-lock.json" }}
-      - run:
-          name: Проверка структуры проекта
-          command: ls -R src/components
-      - run:
-          name: Сборка проекта
-          command: npm run build
-      - run:
-          name: Создание директории артефактов
-          command: mkdir -p ~/artifacts
-      - run:
-          name: Копирование артефактов
-          command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
-      - store_artifacts:
-          path: ~/artifacts
-          destination: node-build
-
-workflows:
-  build:
-    jobs:
-      - build-node
+{
+  "name": "chatroom-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "pretty": "prettier --check --write .",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "^4.2.1",
+    "@tanstack/react-query": "^5.28.8",
+    "axios": "^1.6.8",
+    "clsx": "^2.1.0",
+    "dayjs": "^1.11.10",
+    "formik": "^2.4.5",
+    "framer-motion": "^11.0.23",
+    "lodash": "^4.17.21",
+    "lucide-react": "^0.303.0",
+    "next": "14.0.4",
+    "next-auth": "^4.24.5",
+    "pocketbase": "^0.21.1",
+    "prettier": "^3.2.5",
+    "prettier-plugin-tailwindcss": "^0.5.12",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-hook-form": "^7.49.2",
+    "react-hot-toast": "^2.4.1",
+    "react-intersection-observer": "^9.8.2",
+    "socket.io-client": "^4.7.5",
+    "swr": "^2.2.5",
+    "tailwind-merge": "^2.2.2",
+    "yup": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.202",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.0.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.0.4",
+    "postcss": "^8",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5"
+  }
+}
