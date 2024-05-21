@@ -9,6 +9,7 @@ executors:
 jobs:
   build-and-test:
     executor: docker-executor
+    resource_class: large
     steps:
       - checkout
       - setup_remote_docker:
@@ -22,10 +23,22 @@ jobs:
             curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
             chmod +x /usr/local/bin/docker-compose
 
+      # Restore NPM cache
+      - restore_cache:
+          keys:
+            - v1-npm-cache-{{ checksum "package-lock.json" }}
+            - v1-npm-cache-
+
       # Install dependencies
       - run:
           name: Install Dependencies
           command: npm install
+
+      # Save NPM cache
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-npm-cache-{{ checksum "package-lock.json" }}
 
       # Build the project
       - run:
