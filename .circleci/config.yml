@@ -10,7 +10,7 @@ jobs:
           path: ~/project
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "package-lock.json" }}
+            - v1-dependencies-{{ checksum "chatroom-app/package-lock.json" }}
             - v1-dependencies-
       - run:
           name: Установка Node.js и зависимостей
@@ -18,23 +18,24 @@ jobs:
             echo "Installing Node.js version and dependencies..."
             node --version
             npm --version
+            cd chatroom-app
             npm install
       - save_cache:
           paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package-lock.json" }}
+            - chatroom-app/node_modules
+          key: v1-dependencies-{{ checksum "chatroom-app/package-lock.json" }}
       - run:
           name: Проверка структуры проекта
-          command: ls -R src/components
+          command: ls -R src/app/components
       - run:
           name: Сборка проекта
-          command: npm run build
+          command: cd chatroom-app && npm run build
       - run:
           name: Создание директории артефактов
           command: mkdir -p ~/artifacts
       - run:
           name: Копирование артефактов
-          command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
+          command: cp -R chatroom-app/build chatroom-app/dist chatroom-app/public chatroom-app/.output chatroom-app/.next ~/artifacts 2>/dev/null || true
       - store_artifacts:
           path: ~/artifacts
           destination: node-build
