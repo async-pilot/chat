@@ -15,8 +15,13 @@ jobs:
           keys:
             - v1-dependencies-{{ checksum "package-lock.json" }}
             - v1-dependencies-
-      - node/install-packages:
-          pkg-manager: npm
+      - run:
+          name: Установка Node.js и зависимостей
+          command: |
+            echo "Installing Node.js version and dependencies..."
+            node --version
+            npm --version
+            npm install
       - save_cache:
           paths:
             - node_modules
