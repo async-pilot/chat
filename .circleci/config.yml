@@ -1,43 +1,43 @@
-# This config was automatically generated from your source code
-# Stacks detected: deps:node:chatroom-app
 version: 2.1
-orbs:
-  node: circleci/node@5
 jobs:
-  build-node:
-    # Build node project
-    executor: node/default
-    working_directory: ~/project/chatroom-app
-    steps:
-      - checkout:
-          path: ~/project
-      - node/install-packages:
-          pkg-manager: npm
-      - run:
-          command: npm run build
-      - run:
-          name: Create the ~/artifacts directory if it doesn't exist
-          command: mkdir -p ~/artifacts
-      # Copy output to artifacts dir
-      - run:
-          name: Copy artifacts
-          command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
-      - store_artifacts:
-          path: ~/artifacts
-          destination: node-build
-  deploy:
-    # This is an example deploy job, not actually used by the workflow
-    docker:
-      - image: cimg/base:stable
-    steps:
-      # Replace this with steps to deploy to users
-      - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
-workflows:
   build:
-    jobs:
-      - build-node
-    # - deploy:
-    #     requires:
-    #       - build-node
+    docker:
+      - image: "circleci/node:10.16.0"
+    steps:
+      - checkout
+      - run:
+          name: Update to latest npm version
+          command: "sudo npm install -g npm@latest"
+      - restore_cache: 
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Install `docker-compose`
+          command: |
+            curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+            chmod +x ~/docker-compose
+            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+      - setup_remote_docker:
+          docker_layer_caching: false 
+      - run:
+          name: Build using `docker-compose`
+          command: |
+            docker-compose build
+      - run:
+          name: Login for Docker Hub
+          command: | 
+            echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin
+      - run:
+          name: Push to Docker Hub
+          command: |
+            docker-compose push
+      - run: ssh-keyscan $DIGITALOCEAN_HOST >> ~/.ssh/known_hosts
+      - add_ssh_keys:
+          fingerprints:
+            - fo:of:fe:ef:af
+      - run:
+          name: Remove currently running containers 
+          command: |
+            ssh root@$DIGITALOCEAN_HOST ./deploy_image.sh
